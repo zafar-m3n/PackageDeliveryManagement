@@ -21,7 +21,8 @@ app.listen(8080, () => {
 });
 
 // MongoDB connection settings
-const url = "mongodb://localhost:27017";
+const url =
+  "mongodb+srv://admin:adminPassword@cluster0.sbk4qxz.mongodb.net/package_delivery?retryWrites=true&w=majority";
 
 // Connect to MongoDB using Mongoose
 mongoose
@@ -231,3 +232,48 @@ app.get("/34082115/Durgka/invalid-data", (req, res) => {
 app.get("/34082115/Durgka/*", (req, res) => {
   res.status(404).sendFile(__dirname + "/404.html");
 });
+
+// 9. Get packages assigned to a driver by driver_id
+app.get(
+  "/34082115/Durgka/api/v1/drivers/:driver_id/packages",
+  async (req, res) => {
+    const { driver_id } = req.params;
+
+    try {
+      const packages = await Package.find({ driver_id: driver_id });
+
+      if (packages.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No packages found for this driver." });
+      }
+
+      res.json(packages);
+    } catch (error) {
+      console.error("Error fetching packages for driver:", error);
+      res.status(500).json({ message: "Error fetching packages", error });
+    }
+  }
+);
+// 10. Get driver details for a specific package
+app.get(
+  "/34082115/Durgka/api/v1/packages/:package_id/driver",
+  async (req, res) => {
+    const { package_id } = req.params;
+
+    try {
+      const packageData = await Package.findOne({ package_id }).populate(
+        "driver_id"
+      );
+
+      if (!packageData) {
+        return res.status(404).json({ message: "Package not found" });
+      }
+
+      res.json(packageData.driver_id);
+    } catch (error) {
+      console.error("Error fetching driver for package:", error);
+      res.status(500).json({ message: "Error fetching driver", error });
+    }
+  }
+);
