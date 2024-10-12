@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Package</title>
+    <link rel="stylesheet" href="/styles/add-package.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo-container">
+        <img src="/logo.png" alt="Project Logo" class="logo" />
+        <span class="navbar-title">Package Delivery Management System</span>
+      </div>
+      <div class="nav">
+        <div class="nav-links">
+          <a href="add-driver.html">Add Driver</a>
+          <a href="drivers-list.html">List All Drivers</a>
+          <a href="delete-driver.html">Delete Driver</a>
+          <a href="add-package.html">Add Package</a>
+          <a href="packages-list.html">List All Packages</a>
+          <a href="delete-package.html">Delete Package</a>
+        </div>
+      </div>
+    </header>
+    <div class="form-container">
+      <h1>Add a New Package</h1>
+      <form id="add-package-form">
+        <div class="form-group">
+          <label for="package_title">Title:</label>
+          <input
+            type="text"
+            id="package_title"
+            name="package_title"
+            required
+            minlength="3"
+            maxlength="15"
+            pattern="[A-Za-z0-9]{3,15}"
+          />
+          <span class="error" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="package_weight">Weight:</label>
+          <input
+            type="number"
+            id="package_weight"
+            name="package_weight"
+            required
+            min="1"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="package_destination">Destination:</label>
+          <input
+            type="text"
+            id="package_destination"
+            name="package_destination"
+            required
+            minlength="5"
+            maxlength="15"
+            pattern="[A-Za-z0-9]{5,15}"
+          />
+          <span class="error" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <input
+            type="text"
+            id="description"
+            name="description"
+            minlength="0"
+            maxlength="30"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="isAllocated">Is Allocated:</label>
+          <label class="switch">
+            <input type="checkbox" id="isAllocated" name="isAllocated" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="driver_id">Driver ID:</label>
+          <input
+            type="text"
+            id="driver_id"
+            name="driver_id"
+            required
+            minlength="10"
+            maxlength="10"
+          />
+        </div>
+
+        <button type="submit">Add Package</button>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("add-package-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Get form data
+          const packageData = {
+            package_title: document.getElementById("package_title").value,
+            package_weight: document.getElementById("package_weight").value,
+            package_destination: document.getElementById("package_destination")
+              .value,
+            description: document.getElementById("description").value,
+            isAllocated: document.getElementById("isAllocated").checked,
+            driver_id: document.getElementById("driver_id").value,
+          };
+
+          try {
+            // Send POST request to the correct API endpoint
+            const response = await fetch("/34082115/Durgka/api/v1/packages", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(packageData),
+            });
+
+            if (response.ok) {
+              alert("Package added successfully.");
+              // Optionally, clear the form or redirect the user
+            } else {
+              alert("Error adding package.");
+            }
+          } catch (error) {
+            console.error("Error adding package:", error);
+            alert("Error adding package.");
+          }
+        });
+    </script>
+  </body>
+</html>

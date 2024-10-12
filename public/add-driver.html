@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Driver</title>
+    <link rel="stylesheet" href="/styles/add-driver.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo-container">
+        <img src="/logo.png" alt="Project Logo" class="logo" />
+        <span class="navbar-title">Package Delivery Management System</span>
+      </div>
+      <div class="nav">
+        <div class="nav-links">
+          <a href="add-driver.html">Add Driver</a>
+          <a href="drivers-list.html">List All Drivers</a>
+          <a href="delete-driver.html">Delete Driver</a>
+          <a href="add-package.html">Add Package</a>
+          <a href="packages-list.html">List All Packages</a>
+          <a href="delete-package.html">Delete Package</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="form-container">
+      <h1>Add a New Driver</h1>
+      <form id="add-driver-form">
+        <div class="form-group">
+          <label for="driver_name">Name:</label>
+          <input
+            type="text"
+            id="driver_name"
+            name="driver_name"
+            required
+            minlength="3"
+            maxlength="20"
+          />
+          <span class="error" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="driver_department">Department:</label>
+          <select id="driver_department" name="driver_department" required>
+            <option value="food">Food</option>
+            <option value="furniture">Furniture</option>
+            <option value="electronics">Electronics</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="driver_licence">Licence:</label>
+          <input
+            type="text"
+            id="driver_licence"
+            name="driver_licence"
+            required
+            minlength="5"
+            maxlength="5"
+            pattern="[A-Za-z0-9]{5}"
+          />
+          <span class="error" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="driver_isActive">Is Active:</label>
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="driver_isActive"
+              name="driver_isActive"
+            />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button type="submit">Add Driver</button>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("add-driver-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Get form data
+          const driverData = {
+            driver_name: document.getElementById("driver_name").value,
+            driver_department:
+              document.getElementById("driver_department").value,
+            driver_licence: document.getElementById("driver_licence").value,
+            driver_isActive: document.getElementById("driver_isActive").checked,
+          };
+
+          try {
+            // Send POST request to the correct API endpoint
+            const response = await fetch("/34082115/Durgka/api/v1/drivers", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(driverData),
+            });
+
+            if (response.ok) {
+              alert("Driver added successfully.");
+              // Optionally, clear the form or redirect the user
+            } else {
+              alert("Error adding driver.");
+            }
+          } catch (error) {
+            console.error("Error adding driver:", error);
+            alert("Error adding driver.");
+          }
+        });
+    </script>
+  </body>
+</html>
