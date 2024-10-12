@@ -76,7 +76,7 @@ app.post("/34082115/Durgka/api/v1/drivers", async (req, res) => {
 // 2. List all Drivers (GET)
 app.get("/34082115/Durgka/api/v1/drivers", async (req, res) => {
   try {
-    const drivers = await Driver.find({}).populate("assigned_packages").exec();
+    const drivers = await Driver.find({}).exec();
 
     res.json(drivers);
   } catch (error) {
@@ -169,7 +169,7 @@ app.post("/34082115/Durgka/api/v1/packages/add", async (req, res) => {
 // 6. List all Packages (GET)
 app.get("/34082115/Durgka/api/v1/packages", async (req, res) => {
   try {
-    const packages = await Package.find({}).populate("driver_id").exec();
+    const packages = await Package.find({}).exec();
 
     res.json(packages);
   } catch (error) {
