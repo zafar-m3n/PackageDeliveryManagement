@@ -141,6 +141,7 @@ app.post("/34082115/Durgka/api/v1/packages/add", async (req, res) => {
     package_title,
     package_weight,
     package_destination,
+    description,
     isAllocated,
     driver_id,
   } = req.body;
@@ -150,6 +151,7 @@ app.post("/34082115/Durgka/api/v1/packages/add", async (req, res) => {
       package_title,
       package_weight,
       package_destination,
+      description,
       isAllocated,
       driver_id,
     });
