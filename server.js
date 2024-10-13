@@ -68,8 +68,7 @@ server.listen(8080, () => {
 });
 
 // MongoDB connection settings
-const url =
-  "mongodb+srv://admin:adminPassword@cluster0.sbk4qxz.mongodb.net/package_delivery?retryWrites=true&w=majority";
+const url = "MONGO_URL";
 
 // Connect to MongoDB using Mongoose
 mongoose

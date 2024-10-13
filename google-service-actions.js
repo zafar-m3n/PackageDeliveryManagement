@@ -6,7 +6,7 @@ const textToSpeech = require("@google-cloud/text-to-speech");
 const translateClient = new Translate();
 const ttsClient = new textToSpeech.TextToSpeechClient();
 
-const GOOGLE_MAPS_API_KEY = "AIzaSyAQQ9LoMLxNgfw_M42UttvGyyyK5vbr7us"; // Replace with your actual API key
+const GOOGLE_MAPS_API_KEY = "API_KEY"; // Replace with your actual API key
 
 // Function to calculate distance from a destination to Melbourne in kilometers
 async function calculateDistanceToMelbourne(destination) {
