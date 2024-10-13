@@ -1,11 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
 const ejs = require("ejs");
 const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
 const Driver = require("./models/driver.js");
 const Package = require("./models/package.js");
+const {
+  calculateDistanceToMelbourne,
+  translateText,
+  synthesizeSpeech,
+} = require("./google-service-actions");
 
-// Configure Express
 const app = express();
 app.use(cors());
 app.engine("html", ejs.renderFile);
@@ -13,9 +20,50 @@ app.set("view engine", "html");
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname)));
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+
+  socket.on(
+    "translate",
+    async ({ text, targetLanguage, originalDescription, language }) => {
+      const translatedDescription = await translateText(text, targetLanguage);
+
+      socket.emit("translated", {
+        language,
+        originalDescription,
+        translatedDescription,
+      });
+    }
+  );
+
+  socket.on("textToSpeech", async ({ licence }) => {
+    const audioPath = await synthesizeSpeech(licence);
+    socket.emit("audioFile", audioPath);
+  });
+
+  // Handle distance calculation request
+  socket.on("calculateDistance", async (destination) => {
+    const result = await calculateDistanceToMelbourne(destination.destination);
+    socket.emit("distanceCalculated", result);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
 
 // Start the server on port 8080
-app.listen(8080, () => {
+server.listen(8080, () => {
   console.log("Server running on http://localhost:8080");
 });
 
@@ -33,10 +81,12 @@ mongoose
     console.error("Error connecting to MongoDB:", error);
   });
 
+// Serve the homepage
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
+// 1. Add a new Driver (POST)
 app.post("/34082115/Durgka/api/v1/drivers", async (req, res) => {
   const { driver_name, driver_department, driver_licence, driver_isActive } =
     req.body;
@@ -49,12 +99,6 @@ app.post("/34082115/Durgka/api/v1/drivers", async (req, res) => {
       driver_isActive,
     });
     const savedDriver = await newDriver.save();
-    // const insertResult = await driverCollection.insertOne(newDriver);
-
-    // res.status(201).json({
-    //   id: insertResult.insertedId,
-    //   driver_id: newDriver.driver_id,
-    // });
     res.status(201).json({
       message: "Driver added successfully",
       driver: {
@@ -76,7 +120,6 @@ app.post("/34082115/Durgka/api/v1/drivers", async (req, res) => {
 app.get("/34082115/Durgka/api/v1/drivers", async (req, res) => {
   try {
     const drivers = await Driver.find({}).exec();
-
     res.json(drivers);
   } catch (error) {
     console.error("Error fetching drivers:", error);
@@ -171,7 +214,6 @@ app.post("/34082115/Durgka/api/v1/packages/add", async (req, res) => {
 app.get("/34082115/Durgka/api/v1/packages", async (req, res) => {
   try {
     const packages = await Package.find({}).exec();
-
     res.json(packages);
   } catch (error) {
     console.error("Error fetching packages:", error);
@@ -226,15 +268,17 @@ app.patch("/34082115/Durgka/api/v1/packages/update", async (req, res) => {
   }
 });
 
+// Serve the invalid data page
 app.get("/34082115/Durgka/invalid-data", (req, res) => {
   res.status(400).sendFile(__dirname + "/invalid-data.html");
 });
 
+// Serve the 404 page
 app.get("/34082115/Durgka/*", (req, res) => {
   res.status(404).sendFile(__dirname + "/404.html");
 });
 
-// 9. Get packages assigned to a driver by driver_id
+// 9. Get packages assigned to a driver by driver_id (GET)
 app.get(
   "/34082115/Durgka/api/v1/drivers/:driver_id/packages",
   async (req, res) => {
@@ -256,7 +300,8 @@ app.get(
     }
   }
 );
-// 10. Get driver details for a specific package
+
+// 10. Get driver details for a specific package (GET)
 app.get(
   "/34082115/Durgka/api/v1/packages/:package_id/driver",
   async (req, res) => {
